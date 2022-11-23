@@ -1,0 +1,17 @@
+on:
+  workflow_dispatch:
+
+# Name of the workflow
+name: hello-r-world
+
+# Jobs - What the computer should do? 
+jobs:
+  write-message:
+    # Use Ubuntu   
+    runs-on: ubuntu-latest 
+    steps:
+       # Install R
+      - uses: r-lib/actions/setup-r@v3    
+      - name: print-message   
+        # Code to execute R script
+        run: Rscript -e 'print("Hello R World!")' 
