@@ -1,0 +1,42 @@
+---
+title: "DATA_MONITORING"
+author: "Carlos Couceiro Vlasak"
+date: "2022-11-23"
+output: html_document
+---
+
+```{r setup, include=FALSE, message=FALSE, echo=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(fredr)
+library(forecast)
+library(tidyverse)
+library(lubridate)
+library(hrbrthemes)
+fredr_set_key("ed43ed5f8fa6abd9fb6236a0f64445f5")
+```
+
+## Current account Balance for CZ
+
+```{r  message=FALSE, echo=FALSE, warning=FALSE}
+dat<-fredr(series_id = "CZEB6BLTT02STSAQ")
+
+#Base Model
+
+dat$value<-as.ts(dat$value)
+dat$date<-ymd(dat$date)
+ser<-dat[,c(1,3)]
+
+ggplot(ser, aes(x=date, y=value))+
+  geom_line() +
+  ggtitle('Total Balance as % of GDP for the Czech Republic') +
+  theme_ipsum_tw(grid="XY", axis="xy") 
+
+
+```
+
+## Base Model
+
+```{r message=FALSE, echo=FALSE, warning=FALSE}
+ser$value %>% forecast(h=12)%>%autoplot()
+```
+
