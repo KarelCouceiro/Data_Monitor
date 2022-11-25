@@ -12,6 +12,9 @@ library(forecast)
 library(tidyverse)
 library(lubridate)
 library(hrbrthemes)
+library(plotly)
+library(tsDyn)
+library(DT)
 fredr_set_key("ed43ed5f8fa6abd9fb6236a0f64445f5")
 ```
 
@@ -37,6 +40,48 @@ ggplot(ser, aes(x=date, y=value))+
 ## Base Model
 
 ```{r message=FALSE, echo=FALSE, warning=FALSE}
+
 ser$value %>% forecast(h=12)%>%autoplot()
+
 ```
+
+
+## SETAR Model
+
+
+```{r message=FALSE, echo=FALSE, warning=FALSE, error=FALSE}
+
+grid<-selectSETAR(dat$value, m=3)
+
+grid
+
+fit<-setar(dat$value, mL=2, mH=3, th=-1.169727)
+
+forec<-predict(fit, n.ahead = 7)
+
+dates<-seq(as.Date(max(ser$date)), length.out=8 , by=90)
+
+forec = as.data.frame((forec))
+
+forec$dat<-subset(dates, dates > max(ser$date))
+
+forec<-forec[,c(2,1)]
+names(forec)<-names(ser)
+ser1<-union_all(ser,forec)
+
+ser1$part<-ifelse(ser1$date> max(ser$date), 'predicted', 'real')
+
+
+
+ggplotly(ggplot(ser1, aes(x=date, y=value, color= part))+
+  ggtitle(label = 'Total Balance as % of GDP for the Czech Republic') +
+  theme_ipsum_tw(grid="XY", axis="xy") +
+  geom_line()+
+  geom_smooth())
+
+```
+
+
+
+
 
